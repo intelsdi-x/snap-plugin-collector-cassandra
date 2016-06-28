@@ -154,7 +154,7 @@ func makeLitteralNamespace(url, name string) []string {
 	return ns
 }
 
-// makeDynamicNamespace returns a dynamic namespace
+// makeDynamicNamespace returns a dynamic namespace for metric types
 func makeDynamicNamespace(host, url, name string) core.Namespace {
 	ns := core.NewNamespace("intel", "cassandra", "node").AddDynamicElement("nodeName", "The name of a Cassandra node")
 
