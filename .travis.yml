@@ -2,10 +2,10 @@
 sudo: true
 language: go
 go:
-- 1.6.x
 - 1.7.x
+- 1.8.x
 services:
-  - docker
+- docker
 env:
   global:
   - ORG_PATH=/home/travis/gopath/src/github.com/intelsdi-x
@@ -13,10 +13,10 @@ env:
   matrix:
   - TEST_TYPE=small
   - TEST_TYPE=medium
-  - TEST_TYPE=build
+  - TEST_TYPE: build
 matrix:
   exclude:
-  - go: 1.6.x
+  - go: 1.7.x
     env: TEST_TYPE=build
 before_install:
 - "[[ -d $SNAP_PLUGIN_SOURCE ]] || mkdir -p $ORG_PATH && ln -s $TRAVIS_BUILD_DIR $SNAP_PLUGIN_SOURCE"
@@ -33,9 +33,8 @@ before_deploy:
 - "./scripts/pre_deploy.sh"
 deploy:
 - provider: s3
-  access_key_id: AKIAINMB43VSSPFZISAA
-  secret_access_key:
-    secure: g04JGpKddKvJSWDm44gPdCBiQcl0s9o/8o/P9bP7ec2Y7PTNwdIAilHDTnVrurWTDnVA7LMVM/z2WgR8pRsiSC6J+Osz8r9PUeB0tLCx/xWYb7RMjftdfsxjwWPzOzcBowELYR2QNZfJckStJSQeyYIaIlFb3deM4CUFTVDgO+uSN48mUXYVsnSVaQrOLqDYOSzi/cOeNuHaDXe2IqId7yGZL/F7S/uxbSqEs8ucXZynyfKFPy3l3Iwd/R9v3EiSlc5xNQh9/TxJmOcX44XXxdtLfqj4GvrzuH2QU5Tivtj0jXM8kWvO87kSpzs73AEPCIeqWqUHd5OmVVU9QXG9ZXg756elZt9P3suqVR6YFFDNNseSwBbwPpS/pjXLRBvJb5bi21cfJ78H9GWYP3T44R2gEdL/z9zBvXUy2tcAQP1C9249CZfEnzP+gETYylrQEXIwfxjw3Niww9avHFmF+N0wkMaeIHADfjMh5I1yXCz8cNVwvNQNZ/DcIiwZAhEj7EzJoREyJCJvk/BT7ors+4ySOGaLCyiIJvYyPeToQmpjKlaRdDGvk4HD+eV7EQaZcDp0ZrANotzsiATnZ/tIkBsm3SRVxiMlgMS1jAa44thlcBY830B+69iKRKrN03PshIxtyKxKUlicTZFHepWzIK+mid2mHnzF0gQypqRr9iQ=
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
   bucket: snap.ci.snap-telemetry.io
   region: us-west-2
   skip_cleanup: true
@@ -45,11 +44,10 @@ deploy:
   on:
     repo: intelsdi-x/snap-plugin-collector-cassandra
     branch: master
-    condition: $TEST_TYPE = "build" && $TRAVIS_GO_VERSION = "1.7.x"
+    condition: $TEST_TYPE = "build" && $TRAVIS_GO_VERSION =~ ^1\.8(|\.[0-9]+)$
 - provider: s3
-  access_key_id: AKIAINMB43VSSPFZISAA
-  secret_access_key:
-    secure: g04JGpKddKvJSWDm44gPdCBiQcl0s9o/8o/P9bP7ec2Y7PTNwdIAilHDTnVrurWTDnVA7LMVM/z2WgR8pRsiSC6J+Osz8r9PUeB0tLCx/xWYb7RMjftdfsxjwWPzOzcBowELYR2QNZfJckStJSQeyYIaIlFb3deM4CUFTVDgO+uSN48mUXYVsnSVaQrOLqDYOSzi/cOeNuHaDXe2IqId7yGZL/F7S/uxbSqEs8ucXZynyfKFPy3l3Iwd/R9v3EiSlc5xNQh9/TxJmOcX44XXxdtLfqj4GvrzuH2QU5Tivtj0jXM8kWvO87kSpzs73AEPCIeqWqUHd5OmVVU9QXG9ZXg756elZt9P3suqVR6YFFDNNseSwBbwPpS/pjXLRBvJb5bi21cfJ78H9GWYP3T44R2gEdL/z9zBvXUy2tcAQP1C9249CZfEnzP+gETYylrQEXIwfxjw3Niww9avHFmF+N0wkMaeIHADfjMh5I1yXCz8cNVwvNQNZ/DcIiwZAhEj7EzJoREyJCJvk/BT7ors+4ySOGaLCyiIJvYyPeToQmpjKlaRdDGvk4HD+eV7EQaZcDp0ZrANotzsiATnZ/tIkBsm3SRVxiMlgMS1jAa44thlcBY830B+69iKRKrN03PshIxtyKxKUlicTZFHepWzIK+mid2mHnzF0gQypqRr9iQ=
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
   bucket: snap.ci.snap-telemetry.io
   region: us-west-2
   skip_cleanup: true
@@ -59,10 +57,9 @@ deploy:
   on:
     repo: intelsdi-x/snap-plugin-collector-cassandra
     tags: true
-    condition: $TEST_TYPE = "build" && $TRAVIS_GO_VERSION = "1.7.x"
+    condition: $TEST_TYPE = "build" && $TRAVIS_GO_VERSION =~ ^1\.8(|\.[0-9]+)$
 - provider: releases
-  api_key:
-    secure: Sq0NyCFeGT2cZybblM+9+RGAvJqfN+6cBAETgGIxMXcoGUF0mH/zyxym4cerDfRNBCDDC2aNIjRAgbTCf4Fxo7pRzY3wOqB/MlW1Vvzy5w+xLJ8SYOj9gOItJor6CVWcERby7MXVzpVJBURnfvk6lSJ9DbV2Gr2kxiwuMQWtCaX46zXPcsnirnbkGQ057klG5uATy4gEAgjacwdOdV8NZwa1osb+twqwwR3xNvX4Uwzs24fInmrnJs4vmZJgktQZ3NdzuKyRo2p30SCK536JYEvb5sBSQyCKIpcgNiZ2hYacSv3AjIvRfA1MiRuiK8dqg3tE1hEiQfuZcg77oH/txGLnfiGJL6LcoPMeLam4FTekV9ZLBegrF8JQLm0kxWa0esvMl8sSrhaiZy9bnZz4ek1kSQ4jmow2zqGtn1ubI+y/l3sh2cXT9H/vicVqMahN1nIWcwXCflnOJj/nUX/KSudSR8uzg4a3ewXbZVy4CX+2AJA7NbjwRHgQtBCp31pmnC28O3tXTDBavfVROMVgpHRiL0t9/BCYmYg9DaF/3owVIMqd+cK/GPITMBFsgZfZf3oCbUjfSun2CInB5mcJe708hJU1wPOTo6nYdizpjTnHXDZugdZg94Xhl0ux21p/wVlEUC0KQSFMzadPjplQk4zmAueAQNv6McwU4bLNrQk=
+  api_key: $GITHUB_API_KEY
   file:
     - release/snap-plugin-collector-cassandra_linux_x86_64
     - release/snap-plugin-collector-cassandra_darwin_x86_64
@@ -70,4 +67,4 @@ deploy:
   on:
     repo: intelsdi-x/snap-plugin-collector-cassandra
     tags: true
-    condition: $TEST_TYPE = "build" && $TRAVIS_GO_VERSION = "1.7.x"
+    condition: $TEST_TYPE = "build" && $TRAVIS_GO_VERSION =~ ^1\.8(|\.[0-9]+)$
