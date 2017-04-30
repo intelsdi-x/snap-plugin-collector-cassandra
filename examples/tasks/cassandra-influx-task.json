@@ -1,0 +1,48 @@
+{
+    "version": 1,
+    "schedule": {
+        "type": "simple",
+        "interval": "1s"
+    },
+    "workflow": {
+        "collect": {
+            "metrics": {
+                "/intel/cassandra/node/*/org_apache_cassandra_metrics/type/*/keyspace/*/name/*/Value":{},
+                "/intel/cassandra/node/*/org_apache_cassandra_metrics/type/*/keyspace/*/scope/*/name/*/Max":{}, 
+                "/intel/cassandra/node/*/org_apache_cassandra_metrics/type/*/keyspace/*/scope/*/name/*/50thPercentile": {}
+            },
+            "config": {
+                "/intel/cassandra": {
+                    "url": "192.168.99.100",
+                    "port": 8082
+                }
+            },
+            "process": [
+                {
+                    "plugin_name": "passthru",
+                    "process": null,
+                    "publish": [
+                        {                         
+                            "plugin_name": "file",
+                            "config": {
+                                "file": "/tmp/collected_cassandra"
+                            }
+                        },
+                        {
+                            "plugin_name": "influx",                            
+                            "config": {
+                                "host": "192.168.99.100",
+                                "port": 8086,
+                                "database": "snap",
+                                "user": "admin",
+                                "password": "admin"
+                            }
+                        }
+                    ],
+                    "config": null
+                }
+            ],
+            "publish": null
+        }
+    }
+}

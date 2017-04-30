@@ -34,7 +34,7 @@ const (
 	// Name of plugin
 	Name = "cassandra"
 	// Version of plugin
-	Version = 3
+	Version = 4
 	// Type of plugin
 	PluginType = plugin.CollectorPluginType
 
@@ -83,16 +83,44 @@ func (p *Cassandra) CollectMetrics(mts []plugin.MetricType) ([]plugin.MetricType
 
 		for _, result := range results {
 			ns := append([]string{"intel", "cassandra", "node", p.client.host}, strings.Split(result.Path, Slash)...)
+			nss, tags := processTagNamespace(ns, m.Tags())
+
 			metrics = append(metrics, plugin.MetricType{
-				Namespace_: core.NewNamespace(ns...),
+				Namespace_: core.NewNamespace(nss...),
 				Timestamp_: time.Now(),
 				Data_:      result.Data,
 				Unit_:      reflect.TypeOf(result.Data).String(),
+				Tags_:      tags,
 			})
 		}
 	}
-
 	return metrics, nil
+}
+
+// processTagNamespace creates tags from the giving namespace
+// and returns a new namespace with tags removed.
+func processTagNamespace(ns []string, mp map[string]string) ([]string, map[string]string) {
+	m := map[string]string{}
+
+	// Create the node and the node name tag.
+	m[ns[2]] = ns[3]
+
+	// Create other tags except the last one and the type(ns[5],ns[6]).
+	for i := 7; i < len(ns)-1; i += 2 {
+		m[ns[i]] = ns[i+1]
+	}
+
+	// Create a new namespace with tags removed.
+	nss := []string{}
+	nss = append(nss, ns[0], ns[1], ns[5], ns[6], ns[len(ns)-1])
+
+	// Copy over Snap tags
+	if mp != nil {
+		for k, v := range mp {
+			m[k] = v
+		}
+	}
+	return nss, m
 }
 
 // GetMetricTypes returns the metric types exposed by Cassandra
